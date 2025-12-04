@@ -1,1 +1,0 @@
-Simple servlet example placeholder
