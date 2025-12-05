@@ -124,7 +124,7 @@ If you discover a security vulnerability:
 
 **Do NOT open a public issue.**
 
-Instead, please email: 📧 [security@cspdog.com](security@cspdog.com)
+Instead, please email: 📧 [security@cspdog.com](mailto:security@cspdog.com)
 
 We respond within **48 hours** and follow a standard coordinated disclosure process.
 

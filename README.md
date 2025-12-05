@@ -110,9 +110,9 @@ If you want to help but aren’t sure where to start, check the good first issue
 * **Open Core:** The code in /cspdog-core is released under AGPL v3 (see [LICENSE.md](LICENSE.md)).
 * **Commercial:** A commercial license is available for organizations that cannot comply with AGPL or need enterprise features, SLAs, or private builds. See COMMERCIAL_LICENSE.md for a short summary and contact info.
 
-If you are evaluating for a SaaS product or embedding in a closed-source product, please contact [sales](sales@cspdog.com) for licensing options.
+If you are evaluating for a SaaS product or embedding in a closed-source product, please contact [sales](mailto:sales@cspdog.com) for licensing options.
 
 # Support / Contact
 * GitHub Issues — for bugs & feature requests (open-core)
 * Discussions — design questions, proposals, community help
-* For enterprise support / pilots / licensing: [sales@cspdog.com](sales@cspdog.com)
+* For enterprise support / pilots / licensing: [sales@cspdog.com](mailto:sales@cspdog.com)
