@@ -1,1 +1,1 @@
-Code of conduct placeholder
+Coming... Behave meanwhile!
