@@ -21,10 +21,21 @@ public class Constants {
     public static final String OPENING_EQUALS = "=\"";
     public static final String SINGLE_QUOTE = "'";
     public static final String DOUBLE_QUOTES = "\"";
-    public static final String EMPTY_CHAR = "";
     public static final String NONCE_OPENING = " nonce=\"";
     public static final String CLOSING_QUOTE_SPACED = "\" ";
     public static final String NONCE_REGEX = "<script(?:(?!nonce|src).)*?>|<style(?:(?!nonce).)*?>";
     public static final Pattern NONCE_PATTERN = Pattern.compile(NONCE_REGEX);
-
+    private static final String TAG_WITH_EVENT_HANDLER_REGEX =
+            "<[^>]*\\s(on[a-zA-Z]+\\s*=\\s*\"[^\"]*\"|on[a-zA-Z]+\\s*=\\s*'[^']*'|on[a-zA-Z]+\\s*=[^'\"\\s>]*)[^>]*>";
+    public static final Pattern TAGS_WITH_EVENT_HANDLERS_PATTERN = Pattern.compile(TAG_WITH_EVENT_HANDLER_REGEX, Pattern.CASE_INSENSITIVE);
+    private static final String EVENT_HANDLER_REGEX = "on[a-zA-Z]+\\s*=\\s*(['\\\"])(.*?)\\1";
+    public static final Pattern EVENT_HANDLER_INVOCATION_PATTERN = Pattern.compile(EVENT_HANDLER_REGEX, Pattern.CASE_INSENSITIVE);
+    private static final String INLINED_STYLE_REGEX = "style\\s*=\\s*(['\"])(.*?)\\1";
+    public static final Pattern INLINED_STYLE_PATTERN = Pattern.compile(INLINED_STYLE_REGEX, Pattern.CASE_INSENSITIVE);
+    public static final String DASH = "-";
+    public static final String HASHING_ALGORITHM = "SHA256";
+    public static final String HASHING_ALGORITHM_PREFIX = HASHING_ALGORITHM + DASH;
+    public static final char WHITE_SPACE_SEPARATOR = ' ';
+    public static final String ENFORCED_POLICY_HEADER_NAME = "Content-Security-Policy";
+    public static final String REPORT_ONLY_POLICY_HEADER_NAME = "Content-Security-Policy-Report-Only";
 }

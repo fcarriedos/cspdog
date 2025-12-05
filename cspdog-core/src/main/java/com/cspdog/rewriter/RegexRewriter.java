@@ -1,6 +1,5 @@
 package com.cspdog.rewriter;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,18 +49,6 @@ public class RegexRewriter implements Rewriter {
     private static boolean noProcessingNeeded(String tag, String nonce) {
         logger.trace("noProcessingNeeded(): skipping nonce adding for {}", tag);
         return StringUtils.isBlank(tag) || StringUtils.isBlank(nonce);
-    }
-
-
-    @Override
-    public String getHashesForEventHandlers(String regularHTMLResponse) {
-        return null;
-    }
-
-    @Override
-    public String getCSPHeaders(String nonce) {
-        return "script-src 'self' 'nonce-{nonce}' 'unsafe-inline' 'unsafe-eval';".replaceAll("\\{nonce}", nonce);
-
     }
 
     private static String processHREFJavascript(String preCSPResponse) {
