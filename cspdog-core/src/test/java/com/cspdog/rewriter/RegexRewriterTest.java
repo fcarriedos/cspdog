@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RegexRewriterTest {
 
@@ -109,5 +110,19 @@ public class RegexRewriterTest {
         assertEquals(actual, expected);
     }
 
+    @Test
+    public void testProcessPartialResponseStyles() {
+        String input = "<partial-response><changes><update id=\"form:j_idt12\"><![CDATA[<div id=\"form:j_idt12\" style=\"color:red;\">Partial content</div><div id=\"form:j_idt12\" style=\"color:blue;\">More partial content</div>]]></update></changes></partial-response>";
+        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        assertTrue(actual.contains("<style type=\"text/css\" nonce=\"nonce-123\">"));
+        assertTrue(actual.contains(".cspdog-"));
+        assertTrue(actual.contains("<div id=\"form:j_idt12\" class=\"cspdog-style-"));
+    }
 
+    @Test
+    public void testProcessPartialResponseStyles_NoStyles() {
+        String input = "<partial-response><changes><update id=\"form:j_idt12\"><![CDATA[<div id=\"form:j_idt12\">Partial content</div>]]></update></changes></partial-response>";
+        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        assertEquals(input, actual);
+    }
 }

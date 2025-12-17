@@ -17,7 +17,7 @@ Profit! :)
 * CSPDog **automates** nonce/hash generation and performs safe, **deterministic HTML rewriting** at the servlet layer so teams can enforce CSP without a risky, expensive frontend rewrite.
 
 # High-level architecture
-CSPDog library sits right before your web pages are sent to the web browser, rewriting them so they are comply with your CSP Policy:
+CSPDog library modifies the your web pages right before they are sent to the web browser, rewriting them so they comply with your CSP Policy:
 ![CSPDog HLA](/docs/img/CSPDog-HLA-Stroke-wider.png)
 
 # Installation
