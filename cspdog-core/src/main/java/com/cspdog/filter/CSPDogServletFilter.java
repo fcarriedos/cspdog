@@ -3,6 +3,7 @@ package com.cspdog.filter;
 import com.cspdog.configuration.CSPConfigurationHolder;
 import com.cspdog.rewriter.RegexRewriter;
 import com.cspdog.utils.CSPUtils;
+import com.cspdog.utils.CSPedResponseBodyHolder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
@@ -48,12 +49,10 @@ public class CSPDogServletFilter extends HttpFilter {
         PrintWriter responseWriter = res.getWriter();
         try {
             String nonce = getNonce();
-            String cspedResponse = cspRewriter.getCSPedResponse(originalResponse, nonce);
-            CSPHeaders cspHeaders = CSPUtils.getCSPHeaders(cspedResponse, nonce);
-            res.setHeader(ENFORCED_POLICY_HEADER_NAME, cspHeaders.ENFORCED_POLICY);
-            res.setHeader(REPORT_ONLY_POLICY_HEADER_NAME, cspHeaders.REPORT_ONLY_POLICY);
-            logger.trace("doFilter(): sending CSP-processed response {}", cspedResponse);
-            responseWriter.write(cspedResponse);
+            CSPedResponseBodyHolder<String> cspedResponseBodyHolder = new CSPedResponseBodyHolder<>(cspRewriter.getCSPedResponseBody(originalResponse, nonce));
+            CSPUtils.setPolicyInResponse(cspedResponseBodyHolder, nonce, res);
+            logger.trace("doFilter(): sending CSP-processed response {}", cspedResponseBodyHolder.get());
+            responseWriter.write(cspedResponseBodyHolder.get());
         } catch (Exception e) {
             // Log and fail gracefully avoiding application failures
             // TODO: this would be the right point to send alerts on failures

@@ -55,4 +55,9 @@ public class Constants {
     public static final String CLOSING_CURLY_BRACE = " } ";
     public static final String STYLE = "style";
     public static final int MAX_CSP_HEADER_SIZE = 8191; // In bytes, off by 1 on purpose
+    public static final String UNSAFE_HASHES = "'unsafe-hashes'";
+    public static final String NONCE_PLACEHOLDER_REGEX = "\\{nonce}";
+    public static final String INVOCATION_HASHES_PLACEHOLDER_REGEX = "\\{invocation_hashes}";
+    public static final String INLINE_STYLE_HASHES_PLACEHOLDER_REGEX = "\\{inline_style_hashes}";
+
 }

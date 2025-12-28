@@ -1,6 +1,7 @@
 package com.cspdog.utils;
 
 import com.cspdog.filter.CSPHeaders;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,20 +21,20 @@ public class CSPUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(CSPUtils.class);
 
-    public static CSPHeaders getCSPHeaders(String cspedResponse, String nonce) {
+    private static CSPHeaders getResponseHeaders(CSPedResponseBodyHolder<String> cspedResponseBody, String nonce, HttpServletResponse response) {
         CSPHeaders cspHeaders = new CSPHeaders();
         cspHeaders.ENFORCED_POLICY = cspHeaders.ENFORCED_POLICY
                 .replaceAll("\\{nonce}", nonce)
-                .replaceAll("\\{eventhandlerhashes}", getEventHandlerHashes(cspedResponse))
-                .replaceAll("\\{inlinestyleshashes}", getInlinedStyleHashes(cspedResponse));
+                .replaceAll("\\{eventhandlerhashes}", getEventHandlerHashes(cspedResponseBody.get()))
+                .replaceAll("\\{inlinestyleshashes}", getInlinedStyleHashes(cspedResponseBody.get()));
         cspHeaders.REPORT_ONLY_POLICY = cspHeaders.REPORT_ONLY_POLICY.replaceAll("\\{nonce}", nonce)
                 .replaceAll("\\{nonce}", nonce)
-                .replaceAll("\\{eventhandlerhashes}", getEventHandlerHashes(cspedResponse))
-                .replaceAll("\\{inlinestyleshashes}", getInlinedStyleHashes(cspedResponse));
+                .replaceAll("\\{eventhandlerhashes}", getEventHandlerHashes(cspedResponseBody.get()))
+                .replaceAll("\\{inlinestyleshashes}", getInlinedStyleHashes(cspedResponseBody.get()));
         return cspHeaders;
     }
 
-    public static String getEventHandlerHashes(String htmlOutput) {
+    private static String getEventHandlerHashes(String htmlOutput) {
         if (StringUtils.isBlank(htmlOutput)) {
             return StringUtils.EMPTY;
         }
@@ -102,6 +103,45 @@ public class CSPUtils {
             logger.error("generateCSPHashForInlinedElement(): {} hashing algorithm not found: {}", HASHING_ALGORITHM, e.getMessage());
             return StringUtils.EMPTY;
         }
+    }
+
+    public static void setPolicyInResponse(CSPedResponseBodyHolder<String> cspedResponseBodyHolder, String nonce, HttpServletResponse res) {
+        CSPHeaders cspHeaders = CSPUtils.getResponseHeaders(cspedResponseBodyHolder, nonce, res);
+        setEnforcedHeaders(cspedResponseBodyHolder, cspHeaders, res);
+        setReportOnlyHeaders(cspHeaders, res);
+    }
+
+    private static void setEnforcedHeaders(CSPedResponseBodyHolder<String> cspedResponseBodyHolder, CSPHeaders cspHeaders, HttpServletResponse res) {
+        if (isPolicyNotEmptyAndUnderTheLimit(cspHeaders.ENFORCED_POLICY)) {
+            res.setHeader(ENFORCED_POLICY_HEADER_NAME, cspHeaders.ENFORCED_POLICY);
+            return;
+        }
+        logger.warn("setEnforcedHeaders(): the Content-Security-Policy header size ({} bytes) exceeds the current limit ({} bytes), refusing to apply it to avoid application failures");
+        // TODO: report this separately to CSPDog Reporting Servers
+        // Insert the policy as a meta-tag in the body
+        cspedResponseBodyHolder
+                .set(cspedResponseBodyHolder
+                .get()
+                .replaceFirst("<head[^>]*>", "$0\n<meta http-equiv=\"Content-Security-Policy\" content=\"" + cspHeaders.ENFORCED_POLICY +  "\" />"));
+    }
+
+    private static void setReportOnlyHeaders(CSPHeaders cspHeaders, HttpServletResponse res) {
+        if (isPolicyNotEmptyAndUnderTheLimit(cspHeaders.REPORT_ONLY_POLICY)) {
+            res.setHeader(REPORT_ONLY_POLICY_HEADER_NAME, cspHeaders.REPORT_ONLY_POLICY);
+            return;
+        }
+        // Removing the hashes to fail-fast but preventing application failure,
+        // this needs further revision by either the AppSec team or the CSPDog agent
+        logger.warn("setReportOnlyHeaders(): the Content-Security-Policy-Report-Only header size ({} bytes) exceeds the current limit ({} bytes), refusing to apply it to avoid application failures");
+        // TODO: report this separately to CSPDog Reporting Servers
+        res.setHeader(REPORT_ONLY_POLICY_HEADER_NAME, cspHeaders.REPORT_ONLY_POLICY
+                .replace(UNSAFE_HASHES, EMPTY_CHAR)
+                .replaceAll(INVOCATION_HASHES_PLACEHOLDER_REGEX, EMPTY_CHAR)
+                .replaceAll(INLINE_STYLE_HASHES_PLACEHOLDER_REGEX, EMPTY_CHAR));
+    }
+
+    private static boolean isPolicyNotEmptyAndUnderTheLimit(String policy) {
+        return StringUtils.isNotEmpty(policy) && policy.length() < MAX_CSP_HEADER_SIZE;
     }
 
 }

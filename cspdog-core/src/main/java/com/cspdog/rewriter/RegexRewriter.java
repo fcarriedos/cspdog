@@ -19,7 +19,7 @@ public class RegexRewriter implements Rewriter {
     private static final Logger logger = LoggerFactory.getLogger(
             RegexRewriter.class);
 
-    public String getCSPedResponse(String regularHTMLResponse, String nonce) {
+    public String getCSPedResponseBody(String regularHTMLResponse, String nonce) {
         return processPartialResponses(injectNonce(processHREFJavascript(regularHTMLResponse), nonce), nonce);
     }
 

@@ -22,64 +22,64 @@ public class RegexRewriterTest {
     }
 
     @Test
-    public void testGetCSPedResponseWithDoubleQuotedHref() {
+    public void testGetCSPedResponseBodyWithDoubleQuotedHref() {
         String input = "<html><body><a href=\"javascript:alert('Hello');\">Click me</a></body></html>";
         String expected = "<html><body><a href=\"#\" onclick=\"alert('Hello');\">Click me</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
 
     @Test
-    public void testGetCSPedResponseWithDoubleQuotedHref_SeveralInvocations() {
+    public void testGetCSPedResponseBodyWithDoubleQuotedHref_SeveralInvocations() {
         String input = "<html><body><a href=\"javascript:alert('Hello');console.log('I said hello!');\">Click me</a></body></html>";
         String expected = "<html><body><a href=\"#\" onclick=\"alert('Hello');console.log('I said hello!');\">Click me</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithSingleQuotedHref() {
+    public void testGetCSPedResponseBodyWithSingleQuotedHref() {
         String input = "<html><body><a href='javascript:alert(\"Hello\");'>Click me</a></body></html>";
         String expected = "<html><body><a href=\"#\" onclick=\"alert('Hello');\">Click me</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithSingleQuotedHref_SeveralInvocations() {
+    public void testGetCSPedResponseBodyWithSingleQuotedHref_SeveralInvocations() {
         String input = "<html><body><a href='javascript:alert(\"Hello\");console.log(\"I said hello!\");'>Click me</a></body></html>";
         String expected = "<html><body><a href=\"#\" onclick=\"alert('Hello');console.log('I said hello!');\">Click me</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithEmptyJavascriptHref() {
+    public void testGetCSPedResponseBodyWithEmptyJavascriptHref() {
         String input = "<html><body><a href=\"javascript:\">Click me</a></body></html>";
         String expected = "<html><body><a href=\"#\">Click me</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithVoid0() {
+    public void testGetCSPedResponseBodyWithVoid0() {
         String input = "<html><body><a href='javascript:void(0)'>Click me</a></body></html>";
         String expected = "<html><body><a href=\"#\">Click me</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithSrcJavascriptFalse() {
+    public void testGetCSPedResponseBodyWithSrcJavascriptFalse() {
         String input = "<html><body><iframe src=\"javascript:false\"></iframe></body></html>";
         String expected = "<html><body><iframe src=\"about:blank\"></iframe></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithMixedContent() {
+    public void testGetCSPedResponseBodyWithMixedContent() {
         String input = "<html><body>" +
                 "<a href=\"javascript:alert('Hello');\">Click me</a>" +
                 "<iframe src=\"javascript:false\"></iframe>" +
@@ -90,15 +90,15 @@ public class RegexRewriterTest {
                 "<iframe src=\"about:blank\"></iframe>" +
                 "<a href=\"#\">Do nothing</a>" +
                 "</body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testGetCSPedResponseWithNoJavascript() {
+    public void testGetCSPedResponseBodyWithNoJavascript() {
         String input = "<html><body><a href=\"/index.html\">Home</a></body></html>";
         String expected = "<html><body><a href=\"/index.html\">Home</a></body></html>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(expected, actual);
     }
 
@@ -113,7 +113,7 @@ public class RegexRewriterTest {
     @Test
     public void testProcessPartialResponseStyles() {
         String input = "<partial-response><changes><update id=\"form:j_idt12\"><![CDATA[<div id=\"form:j_idt12\" style=\"color:red;\">Partial content</div><div id=\"form:j_idt12\" style=\"color:blue;\">More partial content</div>]]></update></changes></partial-response>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertTrue(actual.contains("<style type=\"text/css\" nonce=\"nonce-123\">"));
         assertTrue(actual.contains(".cspdog-"));
         assertTrue(actual.contains("<div id=\"form:j_idt12\" class=\"cspdog-style-"));
@@ -122,7 +122,7 @@ public class RegexRewriterTest {
     @Test
     public void testProcessPartialResponseStyles_NoStyles() {
         String input = "<partial-response><changes><update id=\"form:j_idt12\"><![CDATA[<div id=\"form:j_idt12\">Partial content</div>]]></update></changes></partial-response>";
-        String actual = rewriter.getCSPedResponse(input, "nonce-123");
+        String actual = rewriter.getCSPedResponseBody(input, "nonce-123");
         assertEquals(input, actual);
     }
 }
